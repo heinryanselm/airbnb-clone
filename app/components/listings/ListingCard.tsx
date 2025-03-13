@@ -106,15 +106,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <HeartButton listingId={data.id} currentUser={currentUser} />
           </div>
         </div>
-        <div className="font-semibold text-lg">
-          {location?.region}, {location?.label}
-        </div>
-        <div className="font-light text-neutral-500">
-          {reservationDate || data.category}
-        </div>
+        {/* Replace location information with title from database */}
+        <div className="font-semibold text-lg">{data.title}</div>
+
         <div className="flex flex-row items-center gap-1">
-          <div className="font-semibold">$ {price}</div>
-          {!reservation && <div className="font-light">night</div>}
+          <div className="font-semibold">£ {price}</div>
         </div>
         {onAction && actionLabel && (
           <Button

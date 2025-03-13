@@ -25,7 +25,7 @@ export async function POST(request: Request, { params }: { params: IParams }) {
   favoriteIds.push(listingId);
 
   const user = await prisma.user.update({
-    where: {
+    where: { 
       id: currentUser.id,
     },
     data: {

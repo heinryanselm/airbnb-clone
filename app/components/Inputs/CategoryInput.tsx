@@ -28,7 +28,7 @@ const CategoryInput: React.FC<CategoryInputProps> = ({
         hover:border-neutral-500
         transition
         cursor-pointer
-        ${selected ? "border-neutral-500" : "border-neutral-200"}
+        ${selected ? "border-neutral-500" : "border-neutral-200"} 
       `}
     >
       <Icon size={32} />

@@ -16,3 +16,4 @@ const Heading: React.FC<HeadingProps> = ({ title, subtitle, center }) => {
 };
 
 export default Heading;
+ 

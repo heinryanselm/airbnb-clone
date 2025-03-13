@@ -3,32 +3,29 @@ import ClientOnly from "@/app/components/ClientOnly";
 import EmptyState from "@/app/components/EmptyState";
 import ListingClient from "./ListingClient";
 import getCurrentUser from "@/app/actions/getCurrentUser";
-import getReservations from "@/app/actions/getReservations";
 
 interface IParams {
   listingId?: string;
 }
 
 const ListingPage = async ({ params }: { params: IParams }) => {
-  const listing = await getListingById(params);
-  const reservations = await getReservations(params);
+  const listing = await getListingById({ listingId: params.listingId });
   const currentUser = await getCurrentUser();
 
   if (!listing) {
     return (
       <ClientOnly>
-        <EmptyState />
+        <EmptyState
+          title="No listing found"
+          subtitle="The listing you're looking for doesn't exist or has been removed."
+        />
       </ClientOnly>
     );
   }
 
   return (
     <ClientOnly>
-      <ListingClient
-        listing={listing}
-        currentUser={currentUser}
-        reservations={reservations}
-      />
+      <ListingClient listing={listing} currentUser={currentUser} />
     </ClientOnly>
   );
 };

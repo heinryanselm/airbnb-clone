@@ -29,7 +29,7 @@ const FavoritesClient: React.FC<FavoritesClientProps> = ({
           2xl:grid-cols-6
           gap-8
         "
-      >
+      > 
         {listings.map((listing) => (
           <ListingCard
             currentUser={currentUser}

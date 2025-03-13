@@ -41,6 +41,6 @@ export default async function getReservations(params: Reservation) {
       },
     }));
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error); 
   }
 }

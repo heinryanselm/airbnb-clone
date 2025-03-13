@@ -35,7 +35,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value }) => {
             windowBorder: "#90a0b3",
             tabIcon: "#69778A",
             inactiveTabIcon: "#69778A",
-            menuIcons: "#69778A",
+            menuIcons: "#69778A", 
             link: "#F43F5E",
             action: "#8F5DA5",
             inProgress: "#0194c7",

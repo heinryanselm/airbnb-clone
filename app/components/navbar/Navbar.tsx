@@ -6,12 +6,14 @@ import Logo from "./Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
 import Categories from "./Categories";
+import {useRouter} from "next/navigation";
 
 interface NavbarProps {
   currentUser?: User | null;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
+  const router = useRouter();
   return (
     <div className="fixed w-full bg-white z-10 shadow-sm">
       <div className="py-4 border-b-[1px]">
@@ -27,6 +29,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
             "
           >
             <Logo />
+            {/* <div
+              onClick={() => router.push("/listings")}
+              className="hidden md:block cursor-pointer text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition"
+            >
+              Browse Properties
+            </div> */}
             <Search />
             <UserMenu currentUser={currentUser} />
           </div>

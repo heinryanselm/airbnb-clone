@@ -14,7 +14,7 @@ export async function DELETE(request: Request, params: IListingParams) {
     return NextResponse.error();
   }
 
-  const { listingId } = params;
+  const { listingId } = params; 
 
   if (!listingId || typeof listingId !== "string") {
     throw new Error("Invalid ID");

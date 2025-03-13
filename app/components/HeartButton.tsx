@@ -25,7 +25,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
       className="
         relative
         hover:opacity-80
-        transition
+        transition 
         cursor-pointer
       "
     >

@@ -1,7 +1,7 @@
-/** @type {import('next').NextConfig} */
+/* @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    appDir: true,
+    // appDir: true,
   },
   images: {
     domains: [
@@ -9,6 +9,9 @@ const nextConfig = {
       "lh3.googleusercontent.com",
       "res.cloudinary.com",
       "a0.muscache.com",
+      "pixabay.com",
+      "media.rightmove.co.uk",
+      "*"
     ],
   },
 };

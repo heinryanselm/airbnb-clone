@@ -13,55 +13,46 @@ export interface IListingParams {
 
 export default async function getListings(params: IListingParams) {
   try {
-    const {
-      userId,
-      guestCount,
-      roomCount,
-      bathroomCount,
-      startDate,
-      endDate,
-      locationValue,
-      category,
-    } = params;
-
+    // Create a clean query object - avoid direct destructuring
     let query: any = {};
 
-    if (userId) {
-      query.userId = userId;
+    // Safely check each parameter individually
+    if (params.userId) {
+      query.userId = params.userId; 
     }
 
-    if (category) {
-      query.category = category;
+    if (params.category) {
+      query.category = params.category;
     }
 
-    if (locationValue) {
-      query.locationValue = locationValue;
+    if (params.locationValue) {
+      query.locationValue = params.locationValue;
     }
 
-    if (guestCount) {
-      query.guestCount = { gte: +guestCount };
+    if (params.guestCount) {
+      query.guestCount = { gte: +params.guestCount };
     }
 
-    if (roomCount) {
-      query.roomCount = { gte: +roomCount };
+    if (params.roomCount) {
+      query.roomCount = { gte: +params.roomCount };
     }
 
-    if (bathroomCount) {
-      query.bathroomCount = { gte: +bathroomCount };
+    if (params.bathroomCount) {
+      query.bathroomCount = { gte: +params.bathroomCount };
     }
 
-    if (startDate && endDate) {
+    if (params.startDate && params.endDate) {
       query.NOT = {
         reservations: {
           some: {
             OR: [
               {
-                endDate: { gte: startDate },
-                startDate: { lte: startDate },
+                endDate: { gte: params.startDate },
+                startDate: { lte: params.startDate },
               },
               {
-                startDate: { lte: endDate },
-                endDate: { gte: endDate },
+                startDate: { lte: params.endDate },
+                endDate: { gte: params.endDate },
               },
             ],
           },

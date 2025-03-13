@@ -13,3 +13,4 @@ const useSearchModal = create<SearchModalState>((set) => ({
 }));
 
 export default useSearchModal;
+ 

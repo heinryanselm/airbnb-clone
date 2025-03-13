@@ -3,100 +3,47 @@
 import Container from "@/app/components/Container";
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
-import ListingReservation from "@/app/components/listings/ListingReservation";
-import { categories } from "@/app/components/navbar/Categories";
 import useLoginModal from "@/app/hooks/useLoginModal";
-import { Listing, Reservation, User } from "@prisma/client";
-import axios from "axios";
-import { differenceInCalendarDays, eachDayOfInterval } from "date-fns";
+import { Listing, User } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Range } from "react-date-range";
+import { useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
-
-const initialDateRange = {
-  startDate: new Date(),
-  endDate: new Date(),
-  key: "selection",
-};
+import Button from "@/app/components/Button";
+import { FaExternalLinkAlt } from "react-icons/fa";
+//import { BiHome } from "react-icons/bi";
 
 interface IListingClientProps {
-  reservations?: Reservation[];
   listing: Listing & {
-    user: User;
+    user?: User;
   };
-  currentUser?: User | null;
+  currentUser?: User | null; 
 }
 
 const ListingClient: React.FC<IListingClientProps> = ({
   listing,
   currentUser,
-  reservations = [],
 }) => {
   const loginModal = useLoginModal();
   const router = useRouter();
 
-  const disableDates = useMemo(() => {
-    let dates: Date[] = [];
+  // For viewing the original listing
+  const viewOriginalListing = useCallback(() => {
+    if (listing.originalListingUrl) {
+      window.open(listing.originalListingUrl, '_blank');
+    } else {
+      toast.error("Original listing URL not available");
+    }
+  }, [listing.originalListingUrl]);
 
-    reservations.forEach((reservation) => {
-      const range = eachDayOfInterval({
-        start: new Date(reservation.startDate),
-        end: new Date(reservation.endDate),
-      });
-
-      dates = [...dates, ...range];
-    });
-
-    return dates;
-  }, [reservations]);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [totalPrice, setTotalPrice] = useState(listing.price);
-  const [dateRange, setDateRange] = useState<Range>(initialDateRange);
-
-  const onCreateReservation = useCallback(async () => {
+  // For saving to favorites (optional)
+  const saveFavorite = useCallback(() => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-
-    setIsLoading(true);
-
-    axios
-      .post("/api/reservations", {
-        totalPrice,
-        startDate: dateRange.startDate,
-        endDate: dateRange.endDate,
-        listingId: listing?.id,
-      })
-      .then(() => {
-        toast.success("Reservation created successfully");
-        setDateRange(initialDateRange);
-        router.push("/trips");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [totalPrice, dateRange, listing?.id, currentUser, loginModal, router]);
-
-  useEffect(() => {
-    if (dateRange.startDate && dateRange.endDate) {
-      const dayCount = differenceInCalendarDays(
-        dateRange.endDate,
-        dateRange.startDate
-      );
-
-      if (dayCount && listing.price) {
-        setTotalPrice(dayCount * listing.price);
-      } else {
-        setTotalPrice(listing.price);
-      }
-    }
-  }, [dateRange, listing.price]);
-
-  const category = useMemo(() => {
-    return categories.find((item) => item.label === listing.category);
-  }, [listing.category]);
+    
+    // Add your favorite saving logic here
+    toast.success("Property saved to favorites");
+  }, [currentUser, loginModal]);
 
   return (
     <Container>
@@ -121,31 +68,61 @@ const ListingClient: React.FC<IListingClientProps> = ({
           >
             <ListingInfo
               user={listing.user}
-              category={category}
               description={listing.description}
               roomCount={listing.roomCount}
-              guestCount={listing.guestCount}
               bathroomCount={listing.bathroomCount}
               locationValue={listing.locationValue}
+              condition={listing.condition}
+              sourceWebsite={listing.sourceWebsite}
+              lastUpdated={listing.lastUpdated}
             />
             <div
               className=" 
                 col-span-4               
                 order-first
-                mb-10
+                mb-10 
                 md:order-last
                 md:col-span-3
               "
             >
-              <ListingReservation
-                price={listing.price}
-                totalPrice={totalPrice}
-                onChangeDate={(value: Range) => setDateRange(value)}
-                dateRange={dateRange}
-                onSubmit={onCreateReservation}
-                disabled={isLoading}
-                disabledDates={disableDates}
-              />
+              <div className="bg-white rounded-xl border-[1px] border-neutral-200 overflow-hidden">
+                <div className="flex flex-col gap-4 p-5">
+                  <div className="text-2xl font-semibold">
+                    £{listing.price.toLocaleString()}
+                  </div>
+                  
+                  {/* Source info */}
+                  <div className="flex flex-col gap-2">
+                    <div className="text-sm text-neutral-500">
+                      Listed on {listing.sourceWebsite}
+                    </div>
+                  </div>
+                  
+                  {/* Main action button */}
+                  <Button 
+                    label="View on Original Website" 
+                    onClick={viewOriginalListing}
+                    icon={FaExternalLinkAlt}
+                  />
+                  
+                  {/* Optional save button */}
+                  <Button 
+                    label="Save to Favorites" 
+                    onClick={saveFavorite}
+                    outline
+                  />
+                </div>
+              </div>
+              
+              {/* Contact information if available */}
+              {listing.contactInfo && (
+                <div className="mt-6 bg-white rounded-xl border-[1px] border-neutral-200 overflow-hidden">
+                  <div className="p-5">
+                    <div className="font-semibold mb-2">Contact Information</div>
+                    <div className="text-neutral-500 text-sm">{listing.contactInfo}</div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

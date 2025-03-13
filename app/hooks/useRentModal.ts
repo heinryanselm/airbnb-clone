@@ -13,3 +13,4 @@ const useRentModal = create<RentModalState>((set) => ({
 }));
 
 export default useRentModal;
+ 

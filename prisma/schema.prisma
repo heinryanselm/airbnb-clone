@@ -46,21 +46,39 @@ model Account {
 }
 
 model Listing {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String   @db.ObjectId
-  title         String
-  description   String
-  imageSrc      String
-  createdAt     DateTime @default(now())
-  category      String
-  roomCount     Int
-  bathroomCount Int
-  guestCount    Int
-  locationValue String
-  price         Int
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reservations Reservation[]
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId              String?   @db.ObjectId
+  title               String
+  description         String
+  imageSrc            String
+  additionalImages    String[]  // Array of image URLs
+  price               Int
+  condition           String?
+  roomCount           Int
+  bathroomCount       Int
+  guestCount          Int       // Could be reused as occupancy
+  locationValue       String
+  address             String?   // Full address
+  city                String?
+  postalCode          String?
+  propertyType        String?   // House, apartment, etc.
+  sourceWebsite       String?   // e.g., "Rightmove"
+  originalListingUrl  String?   // URL to original listing
+  agentName           String?
+  agentPhone          String?
+  agentEmail          String?
+  contactInfo         String?
+  estSqFt             Int?      // Estimated square footage
+  constructionYear    Int?
+  energyRating        String?
+  addedDate           DateTime? // When listing was added to source
+  lastUpdated         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  // Relations
+  user                User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  reservations        Reservation[]
 }
 
 model Reservation {
@@ -73,5 +91,5 @@ model Reservation {
   createdAt  DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade) 
 }

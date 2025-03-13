@@ -104,7 +104,7 @@ const LoginModal = () => {
         "
       >
         <div className="flex flex-row items-center justify-center gap-2">
-          <div>First time using Airbnb?</div>
+          <div>Looking for a property?</div>
           <div
             onClick={toggle}
             className="
@@ -114,7 +114,7 @@ const LoginModal = () => {
             "
           >
             Create an account
-          </div>
+          </div> 
         </div>
       </div>
     </div>

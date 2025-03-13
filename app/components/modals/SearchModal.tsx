@@ -1,25 +1,47 @@
 "use client";
 
 import qs from "query-string";
-import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
-import { Range } from "react-date-range";
-import { formatISO } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import useSearchModal from "@/app/hooks/useSearchModal";
 
 import Modal from "./Modal";
-import Calendar from "../Inputs/Calendar";
 import Counter from "../Inputs/Counter";
 import CountrySelect, { CountrySelectValue } from "../Inputs/CountrySelect";
 import Heading from "../Heading";
 
+// Add for property conditions
+import {
+  IoHomeOutline,
+  IoConstructOutline,
+  IoWarningOutline,
+} from "react-icons/io5";
+
 enum STEPS {
   LOCATION = 0,
-  DATE = 1,
-  INFO = 2,
+  DETAILS = 1,
+  PRICE = 2,
 }
+
+// Property condition options
+const CONDITIONS = [
+  { label: "Ready to move in", value: "move-in-ready", icon: IoHomeOutline },
+  {
+    label: "Needs renovation",
+    value: "needs-renovation",
+    icon: IoConstructOutline,
+  },
+  { label: "Fixer-upper", value: "fixer-upper", icon: IoWarningOutline },
+];
+
+// Property types
+const PROPERTY_TYPES = [
+  { label: "House", value: "house" },
+  { label: "Flat/Apartment", value: "flat" },
+  { label: "Commercial", value: "commercial" },
+  { label: "Land", value: "land" },
+];
 
 const SearchModal = () => {
   const router = useRouter();
@@ -29,23 +51,12 @@ const SearchModal = () => {
   const [step, setStep] = useState(STEPS.LOCATION);
 
   const [location, setLocation] = useState<CountrySelectValue>();
-  const [guestCount, setGuestCount] = useState(1);
   const [roomCount, setRoomCount] = useState(1);
   const [bathroomCount, setBathroomCount] = useState(1);
-  const [dateRange, setDateRange] = useState<Range>({
-    startDate: new Date(),
-    endDate: new Date(),
-    key: "selection",
-  });
-
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("../Map"), {
-        ssr: false,
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location]
-  );
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000000);
+  const [propertyType, setPropertyType] = useState("");
+  const [propertyCondition, setPropertyCondition] = useState("");
 
   const onBack = useCallback(() => {
     setStep((value) => value - 1);
@@ -56,7 +67,7 @@ const SearchModal = () => {
   }, []);
 
   const onSubmit = useCallback(async () => {
-    if (step !== STEPS.INFO) {
+    if (step !== STEPS.PRICE) {
       return onNext();
     }
 
@@ -69,18 +80,13 @@ const SearchModal = () => {
     const updatedQuery: any = {
       ...currentQuery,
       locationValue: location?.value,
-      guestCount,
       roomCount,
       bathroomCount,
+      minPrice,
+      maxPrice,
+      propertyType: propertyType || undefined,
+      propertyCondition: propertyCondition || undefined,
     };
-
-    if (dateRange.startDate) {
-      updatedQuery.startDate = formatISO(dateRange.startDate);
-    }
-
-    if (dateRange.endDate) {
-      updatedQuery.endDate = formatISO(dateRange.endDate);
-    }
 
     const url = qs.stringifyUrl(
       {
@@ -98,16 +104,18 @@ const SearchModal = () => {
     searchModal,
     location,
     router,
-    guestCount,
     roomCount,
-    dateRange,
-    onNext,
     bathroomCount,
+    minPrice,
+    maxPrice,
+    propertyType,
+    propertyCondition,
+    onNext,
     params,
   ]);
 
   const actionLabel = useMemo(() => {
-    if (step === STEPS.INFO) {
+    if (step === STEPS.PRICE) {
       return "Search";
     }
 
@@ -122,62 +130,121 @@ const SearchModal = () => {
     return "Back";
   }, [step]);
 
+  // Location selection step
   let bodyContent = (
     <div className="flex flex-col gap-8">
       <Heading
-        title="Where do you wanna go?"
-        subtitle="Find the perfect location!"
+        title="Where are you looking for a property?"
+        subtitle="Find your perfect location!"
       />
       <CountrySelect
         value={location}
         onChange={(value) => setLocation(value as CountrySelectValue)}
       />
       <hr />
-      <Map center={location?.latlng} />
     </div>
   );
 
-  if (step === STEPS.DATE) {
+  // Property details step
+  if (step === STEPS.DETAILS) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="When do you plan to go?"
-          subtitle="Make sure everyone is free!"
+        <Heading title="Property details" subtitle="Narrow your search!" />
+
+        {/* Property type selection */}
+        <div>
+          <div className="font-semibold mb-2">Property Type</div>
+          <div className="grid grid-cols-2 gap-3">
+            {PROPERTY_TYPES.map((type) => (
+              <div
+                key={type.value}
+                onClick={() => setPropertyType(type.value)}
+                className={`
+                  border-2 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer
+                  ${
+                    propertyType === type.value
+                      ? "border-black"
+                      : "border-neutral-200"
+                  }
+                `}
+              >
+                <div className="font-medium">{type.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <hr />
+
+        {/* Property condition */}
+        <div>
+          <div className="font-semibold mb-2">Property Condition</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {CONDITIONS.map((condition) => (
+              <div
+                key={condition.value}
+                onClick={() => setPropertyCondition(condition.value)}
+                className={`
+                  border-2 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer
+                  ${
+                    propertyCondition === condition.value
+                      ? "border-black"
+                      : "border-neutral-200"
+                  }
+                `}
+              >
+                <condition.icon size={28} />
+                <div className="font-medium">{condition.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <hr />
+
+        {/* Room and bathroom counts */}
+        <Counter
+          title="Rooms"
+          subtitle="Minimum number of rooms needed"
+          value={roomCount}
+          onChange={(value) => setRoomCount(value)}
         />
-        <Calendar
-          onChange={(value) => setDateRange(value.selection)}
-          value={dateRange}
+        <hr />
+        <Counter
+          title="Bathrooms"
+          subtitle="Minimum number of bathrooms needed"
+          value={bathroomCount}
+          onChange={(value) => setBathroomCount(value)}
         />
       </div>
     );
   }
 
-  if (step === STEPS.INFO) {
+  // Price range step
+  if (step === STEPS.PRICE) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading title="More information" subtitle="Find your perfect place!" />
-        <Counter
-          onChange={(value) => setGuestCount(value)}
-          value={guestCount}
-          title="Guests"
-          subtitle="How many guests are coming?"
-        />
-        <hr />
-        <Counter
-          onChange={(value) => setRoomCount(value)}
-          value={roomCount}
-          title="Rooms"
-          subtitle="How many rooms do you need?"
-        />
-        <hr />
-        <Counter
-          onChange={(value) => {
-            setBathroomCount(value);
-          }}
-          value={bathroomCount}
-          title="Bathrooms"
-          subtitle="How many bahtrooms do you need?"
-        />
+        <Heading title="Price Range" subtitle="Set your budget" />
+
+        {/* Min price input */}
+        <div>
+          <div className="font-medium mb-2">Minimum Price (£)</div>
+          <input
+            type="number"
+            className="w-full p-4 font-light bg-white border-2 rounded-md outline-none transition"
+            value={minPrice}
+            onChange={(e) => setMinPrice(parseInt(e.target.value) || 0)}
+          />
+        </div>
+
+        {/* Max price input */}
+        <div>
+          <div className="font-medium mb-2">Maximum Price (£)</div>
+          <input
+            type="number"
+            className="w-full p-4 font-light bg-white border-2 rounded-md outline-none transition"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(parseInt(e.target.value) || 0)}
+          />
+        </div>
       </div>
     );
   }
@@ -185,7 +252,7 @@ const SearchModal = () => {
   return (
     <Modal
       isOpen={searchModal.isOpen}
-      title="Filters"
+      title="Search Properties"
       actionLabel={actionLabel}
       onSubmit={onSubmit}
       secondaryActionLabel={secondaryActionLabel}

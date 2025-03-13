@@ -31,8 +31,8 @@ const Button: React.FC<ButtonProps> = ({
         hover:opacity-80
         transition
         w-full
-        ${outline ? "bg-white" : "bg-rose-500"}
-        ${outline ? "border-black" : "bg-rose-500"}
+        ${outline ? "bg-white" : "bg-cyan-500"}
+        ${outline ? "border-black" : "bg-cyan-500"}
         ${outline ? "text-black" : "text-white"}
         ${small ? "py-1" : "py-3"}
         ${small ? "text-sm" : "text-md"}
@@ -43,7 +43,7 @@ const Button: React.FC<ButtonProps> = ({
       {Icon && <Icon className="absolute left-4 top-3" size={24} />}
       {label}
     </button>
-  );
+  ); 
 };
 
 export default Button;
