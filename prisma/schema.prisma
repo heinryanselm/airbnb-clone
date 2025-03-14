@@ -62,7 +62,7 @@ model Listing {
   city                String?
   postalCode          String?
   propertyType        String?   // House, apartment, etc.
-  sourceWebsite       String?   // e.g., "Rightmove"
+  sourceWebsite       String?   // e.g., "Rightmove", "Hunters", etc.
   originalListingUrl  String?   // URL to original listing
   agentName           String?
   agentPhone          String?
